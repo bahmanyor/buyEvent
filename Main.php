@@ -5,23 +5,33 @@ namespace BuyEvent;
 
 
 
-use BuyEvent\event_dispatcher\EventDispatcher;
-use BuyEvent\orders\Order;
-use BuyEvent\orders\OrderFormalizeService;
-use BuyEvent\clients\Client;
-use BuyEvent\clients\IClientRepository;
-use BuyEvent\common\Currency;
-use BuyEvent\events\BuyEvent;
-use BuyEvent\notifications\NotificationFactory;
-use BuyEvent\products\IProductRepository;
-use BuyEvent\products\Product;
+use BuyEvent\Clients\ClientRepository;
+use BuyEvent\DI\IDependencyInjection;
+use BuyEvent\EventDispatcher\EventDispatcher;
+use BuyEvent\Listeners\BuyEventListener;
+use BuyEvent\Listeners\IEventListener;
+use BuyEvent\Orders\IOrderFormalizeService;
+use BuyEvent\Orders\IOrderRepository;
+use BuyEvent\Orders\Order;
+use BuyEvent\Orders\OrderFormalizeService;
+use BuyEvent\Clients\Client;
+use BuyEvent\Clients\IClientRepository;
+use BuyEvent\Common\Currency;
+use BuyEvent\Events\BuyEvent;
+use BuyEvent\Notifications\NotificationFactory;
+use BuyEvent\Orders\OrderRepository;
+use BuyEvent\Products\IProductRepository;
+use BuyEvent\Products\Product;
+use BuyEvent\Products\ProductRepository;
 
 class Main {
      private  IClientRepository $clientRepository;
      private IProductRepository $productRepository;
-     public function __construct(IClientRepository $clientRepository, IProductRepository $productRepository) {
-         $this->clientRepository = $clientRepository;
-         $this->productRepository = $productRepository;
+     private IOrderFormalizeService $orderFormalizeService;
+     public function __construct(IDependencyInjection $di) {
+         $this->clientRepository = $di->get(ClientRepository::class);
+         $this->productRepository = $di->get(ProductRepository::class);
+         $this->orderFormalizeService = $di->get(OrderFormalizeService::class);
      }
 
      public function main(){
@@ -35,17 +45,8 @@ class Main {
 
          $line = readline('enter nnotification type please (sms, email):');
          $order = new Order($product, $client);
-         $dispatcher = new EventDispatcher();
-         $dispatcher->addEventListener(BuyEvent::class, function (BuyEvent $event){
-             $product = $event->getOrder()->getProduct();
-             $notificationFactory = new NotificationFactory();
-             $notification = $notificationFactory->createNotification($event->getNotificationType());
-             $text = "you buy {$product->getName()} with price {$product->getPrice()} {$product->getCurrency()}";
-             $notification->send($event->getOrder()->getClient(), $text);
-         });
 
-         $orderFormalize = new OrderFormalizeService($order, $dispatcher);
-         $orderFormalize->setNotificationType($line);
-         $orderFormalize->formalize();
+         $this->orderFormalizeService->setNotificationType($line);
+         $this->orderFormalizeService->formalize($order);
      }
 }
