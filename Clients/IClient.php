@@ -5,6 +5,8 @@ namespace BuyEvent\Clients;
 
 
 interface IClient {
+    
+    
     /**
      * @return string
      */

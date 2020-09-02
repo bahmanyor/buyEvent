@@ -13,6 +13,7 @@ use BuyEvent\Orders\OrderRepository;
 use BuyEvent\Products\ProductRepository;
 
 require_once __DIR__ . '/vendor/autoload.php';
+//todo refactoring
 $clientRepository = new ClientRepository();
 $productRepository = new ProductRepository();
 $eventDispatcher = new EventDispatcher();
