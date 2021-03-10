@@ -13,17 +13,19 @@ use BuyEvent\Orders\OrderRepository;
 use BuyEvent\Products\ProductRepository;
 
 require_once __DIR__ . '/vendor/autoload.php';
-$clientRepository = new ClientRepository();
-$productRepository = new ProductRepository();
-$eventDispatcher = new EventDispatcher();
-$orderRepository = new OrderRepository();
+//$clientRepository = new ClientRepository();
+//$productRepository = new ProductRepository();
+//$eventDispatcher = new EventDispatcher();
+//$orderRepository = new OrderRepository();
+//
+//$eventDispatcher->addEventListener(BuyEvent::class, new BuyEventListener());
+//$orderFormalize = new OrderFormalizeService($eventDispatcher, $orderRepository);
+//
+//$di = new DI();
+//$di->set(ClientRepository::class, $clientRepository);
+//$di->set(ProductRepository::class, $productRepository);
+//$di->set(OrderFormalizeService::class, $orderFormalize);
+//
+//(new Main($di))->main();
 
-$eventDispatcher->addEventListener(BuyEvent::class, new BuyEventListener());
-$orderFormalize = new OrderFormalizeService($eventDispatcher, $orderRepository);
-
-$di = new DI();
-$di->set(ClientRepository::class, $clientRepository);
-$di->set(ProductRepository::class, $productRepository);
-$di->set(OrderFormalizeService::class, $orderFormalize);
-
-(new Main($di))->main();
+\BuyEvent\DI\Container::getInstance()->make();
